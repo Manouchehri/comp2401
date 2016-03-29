@@ -8,9 +8,9 @@ int list_enqueue(ListType *l, SongType *s)
     return EXIT_FAILURE;
   }
 
-  if (l->head == NULL ^ l->tail == NULL){
+  if ((l->head == NULL) ^ (l->tail == NULL)){
     perror("list_add_to_end: inconsistent list, head or tail is null but not both!");
-    return EXIT_FAILURE
+    return EXIT_FAILURE;
   }
 
   if (l->head == NULL){
@@ -31,7 +31,7 @@ int list_remove(ListType *l, char *song_name)
   NodeType *p, *p_prev = NULL;
   bool found = false;
 
-  if (l == NULL || s == NULL){
+  if (l == NULL || song_name == NULL){
     perror("list_remove: null parameter");
     return EXIT_FAILURE;
   }
@@ -48,7 +48,7 @@ int list_remove(ListType *l, char *song_name)
       perror("list_remove: node has null data pointer!");
       return EXIT_FAILURE;
     }
-    if (strncmp(p->data->name,song_name)==0){
+    if (strcasecmp(p->data->name,song_name)==0){
       found = true;
       break;
     }
@@ -90,7 +90,7 @@ int list_print(ListType *l)
 
   if (l->head == NULL || l->tail == NULL){
     printf("Empty list.\n");
-    return EXIT_SUCCESS
+    return EXIT_SUCCESS;
   }
 
   printf("%-4s %-32s %-20s %-20s %-4s\n","[#]","Name","Artist","Album","Duration");
@@ -99,7 +99,7 @@ int list_print(ListType *l)
   i=0;
   p = l->head;
   while(p != NULL){
-    printf("[%02d] %-32s %-20s %-20s %-4s\n",++i,p->data->name,p->data->artist,p->data->album,p->data->duration);
+    printf("[%02d] %-32s %-20s %-20s %04d\n",++i,p->data->name,p->data->artist,p->data->album,p->data->duration);
     p = p->next;
   }
 

@@ -70,7 +70,7 @@ void initServerSocket()
 void waitForConnection()
 {
   struct sockaddr_in clientAddr;
-  int addrSize;
+  socklen_t addrSize;
 
   printf("waiting for connection... \n");
 

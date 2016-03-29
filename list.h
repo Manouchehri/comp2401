@@ -14,14 +14,14 @@ typedef struct SongType {
   int duration;
 } SongType;
 
-typedef struct NodeType {
+typedef struct Node {
   struct Node *next;
   SongType *data;
 } NodeType;
 
 typedef struct ListType {
-  Node *head;
-  Node *tail;
+  NodeType *head;
+  NodeType *tail;
 } ListType;
 
 /* ./list.c */

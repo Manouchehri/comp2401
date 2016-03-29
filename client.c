@@ -8,15 +8,23 @@ int main()
   initClientSocket();
 
 /* get input from user and send to server */
-  while (1) {
-    printf("Please enter message: ");
+  for(;;) {
+    printMenu();
+
+    memset(str,'0',MAX_STR);
     fgets(str, sizeof(str), stdin);
-    str[strlen(str)-1] = '\0';
 
     strcpy(buffer, str);
     send(mySocket, buffer, strlen(buffer), 0);
-    if (strcmp(str, "quit") == 0)
-      break;
+    if (strncasecmp(str, "a",1) == 0){ 
+
+      continue;
+    }
+    if (strncasecmp(str, "d",1) == 0){
+      controller_delete();
+    }
+    if (strncasecmp(str, "v",1) == 0)
+    if (strncasecmp(str, "q",1) == 0)
   }
 
 /* close the socket */
@@ -25,7 +33,7 @@ int main()
   return 0;
 }
 
-void initClientSocket()
+void initClientSocket(void)
 {
   struct sockaddr_in  addr;
   int i;
@@ -54,3 +62,7 @@ void initClientSocket()
   }
 }
 
+void printMenu(void)
+{
+  printf(MENU_TEXT);
+}
