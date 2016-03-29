@@ -8,10 +8,11 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
-#define SERVER_IP "10.0.2.15"
+#define SERVER_IP "127.0.0.1"
 #define SERVER_PORT 60003
 
 #include "defs.h"
 
 int  mySocket;
-void initClientSocket();
+
+void initClientSocket(void);

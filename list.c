@@ -38,7 +38,7 @@ int list_remove(ListType *l, char *song_name)
 
   if (l->head == NULL || l->tail == NULL){
     perror("list_remove: cannot remove from empty list!");
-    return EXIT_FAILURE
+    return EXIT_FAILURE;
   }
 
   /* find the node */
@@ -46,7 +46,7 @@ int list_remove(ListType *l, char *song_name)
   while(p != NULL){
     if (p->data == NULL){
       perror("list_remove: node has null data pointer!");
-      return EXIT_FAILURE
+      return EXIT_FAILURE;
     }
     if (strncmp(p->data->name,song_name)==0){
       found = true;

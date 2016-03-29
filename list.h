@@ -17,7 +17,7 @@ typedef struct SongType {
 typedef struct NodeType {
   struct Node *next;
   SongType *data;
-} Node;
+} NodeType;
 
 typedef struct ListType {
   Node *head;
