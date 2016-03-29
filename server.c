@@ -1,16 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-
-#define MY_PORT 60003
-
-#include "defs.h"
-void initServerSocket();
-void waitForConnection();
-void recvText(char*);
+#include  "server.h"
 
 int myListenSocket, clientSocket;
 

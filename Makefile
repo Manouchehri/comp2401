@@ -1,13 +1,26 @@
-DEBUG= 
-EXECS= server client 
+cc := gcc
+CFLAGS := -Wall -Wextra -Wmissing-prototypes -std=c99 -g -ggdb -g3
 
-all:	$(EXECS)
+SERVER_SRC := server.c list.c
+SERVER_OBJ := $(SERVER_SRC:.c=.o)
+SERVER_BIN := server
 
-server:	server.c defs.h
-	gcc $(DEBUG) -o server server.c
+CLIENT_SRC := client.c
+CLIENT_OBJ := $(CLIENT_SRC:.c=.o)
+CLIENT_BIN := client
 
-client:	client.c defs.h
-	gcc $(DEBUG) -o client client.c
+.PHONY: all dev
+
+dev: clean all
+	ctags -f .tags -R .
+
+all: $(CLIENT_BIN) $(SERVER_BIN)
+
+$(CLIENT_BIN): $(CLIENT_OBJ)
+	$(cc) $(CFLAGS) $(CLIENT_OBJ) -o $(CLIENT_BIN)
+
+$(SERVER_BIN): $(SERVER_OBJ)
+	$(cc) $(CFLAGS) $(SERVER_OBJ) -o $(SERVER_BIN)
 
 clean:
-	rm -f $(EXECS)
+	rm -f $(CLIENT_BIN) $(SERVER_BIN) $(CLIENT_OBJ) $(SERVER_OBJ)
