@@ -1,4 +1,5 @@
 #pragma once
+
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -7,7 +8,7 @@
 #include <assert.h>
 #include "defs.h"
 
-typedef struct SongType {
+typedef struct Song {
   char name[MAX_STR];
   char artist[MAX_STR];
   char album[MAX_STR];
@@ -19,7 +20,7 @@ typedef struct Node {
   SongType *data;
 } NodeType;
 
-typedef struct ListType {
+typedef struct List {
   NodeType *head;
   NodeType *tail;
 } ListType;

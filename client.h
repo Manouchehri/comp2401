@@ -10,24 +10,24 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <signal.h>
 
 #define SERVER_IP "127.0.0.1"
 #define SERVER_PORT 60003
 
 #define MENU_TEXT "\nWhat shall we do now?\n[A]dd song\t[D]elete song\t[V]iew songs\t[Q]uit \n"
 
-#include "protocol.h"
 #include "ainsi.h"
 #include "defs.h"
+#include "protocol.h"
 
-int  mySocket;
+int  global_socket;
 
 /* client.c */
-void initClientSocket(void);
-void printMenu(void);
+void sig_handler(int signum, siginfo_t *info, void *ptr);
+void controller_add(void);
 void controller_delete(void);
 void controller_view(void);
-void controller_add(void);
 void controller_quit(void);
-void get_and_send_for(const char *prompt, const char *accept);
-void socket_send(const char *str);
+void view_menu(void);
+void init_client_socket(void);

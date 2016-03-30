@@ -1,11 +1,11 @@
 cc := gcc
-CFLAGS := -Wall -Wextra -Wmissing-prototypes -std=c99 -g -ggdb -g3
+CFLAGS := -D_POSIX_C_SOURCE=199309L -Wall -Wextra -Wmissing-prototypes -std=c99 -g -ggdb -g3
 
-SERVER_SRC := server.c list.c
+SERVER_SRC := server.c list.c protocol.c
 SERVER_OBJ := $(SERVER_SRC:.c=.o)
 SERVER_BIN := server
 
-CLIENT_SRC := client.c
+CLIENT_SRC := client.c protocol.c
 CLIENT_OBJ := $(CLIENT_SRC:.c=.o)
 CLIENT_BIN := client
 

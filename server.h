@@ -17,4 +17,3 @@
 /* server.c */
 void initServerSocket(void);
 void waitForConnection(void);
-void recvText(char *text);

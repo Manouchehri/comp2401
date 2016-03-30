@@ -1,3 +1,4 @@
+#pragma once
 /* From http://stackoverflow.com/a/3219471/3337659 */
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_GREEN   "\x1b[32m"
