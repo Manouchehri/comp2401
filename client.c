@@ -11,7 +11,7 @@ int main()
   for (;; ) {
     printMenu();
 
-    memset(str, '0', MAX_STR);
+    memset(str, 0, MAX_STR);
     fgets(str, MAX_STR-1, stdin);
 
     if (strncasecmp(str, "a", 1) == 0) {
@@ -74,28 +74,58 @@ void controller_delete(void)
 {
   char buf[MAX_BUFF];
   memset(buf, 0, MAX_BUFF);
+
   socket_send(PROTO_DELETE);
-  printf("Enter song name to be deleted:\t");
+
+  printf("Enter song name to delete:\t");
   memset(buf, 0, MAX_BUFF);
   fgets(buf,MAX_STR,stdin);
   socket_send(buf);
 }
 void controller_view(void)
 {
-  
+  socket_send(PROTO_VIEW);
 }
 void controller_add(void)
 {
-  
+
+  socket_send(PROTO_ADD);
+  get_and_send_for("Enter song name:\t",PROTO_VALID_USER_INPUT_CHARS);
+  get_and_send_for("Enter artist:\t",PROTO_VALID_USER_INPUT_CHARS);
+  get_and_send_for("Enter album:\t",PROTO_VALID_USER_INPUT_CHARS);
+  get_and_send_for("Enter duration:\t",PROTO_VALID_USER_INPUT_CHARS_FOR_INTEGER);
 }
 void controller_quit(void)
 {
-  
+  socket_send(PROTO_QUIT);
 }
 
-void socket_send(char *str)
+void get_and_send_for(const char *prompt, const char *accept)
+{
+  int a,b;
+  char buf[MAX_BUFF];
+
+  for(;;){
+    printf("%s",prompt);
+    memset(buf, 0, MAX_BUFF);
+    if(fgets(buf,MAX_STR,stdin) == NULL){
+      continue;
+    }
+    buf[strlen(buf)-1]=0; // replace \n with \0
+    if((a=strspn(buf,accept)) != (b=strlen(buf))){
+      printf("strspn=%d strlen=%d {%s}\n",a,b,buf);
+      printf("Invalid input. Only the characters below are allowed. Try again.\n[%s]\n",accept);
+      continue;
+    }
+    socket_send(buf);
+    break;
+  }
+}
+
+void socket_send(const char *str)
 {
   char buffer[MAX_BUFF];
+  memset(buffer, 0, MAX_BUFF);
 
   assert(mySocket != -1); // the socket must be initialized
 

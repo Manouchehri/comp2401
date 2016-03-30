@@ -16,6 +16,8 @@
 
 #define MENU_TEXT "\nWhat shall we do now?\n[A]dd song\t[D]elete song\t[V]iew songs\t[Q]uit \n"
 
+#include "protocol.h"
+#include "ainsi.h"
 #include "defs.h"
 
 int  mySocket;
@@ -27,4 +29,5 @@ void controller_delete(void);
 void controller_view(void);
 void controller_add(void);
 void controller_quit(void);
-void socket_send(char *str);
+void get_and_send_for(const char *prompt, const char *accept);
+void socket_send(const char *str);

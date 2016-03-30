@@ -11,6 +11,8 @@
 
 #include "list.h"
 #include "defs.h"
+#include "protocol.h"
+#include "ainsi.h"
 
 /* server.c */
 void initServerSocket(void);
