@@ -18,20 +18,22 @@ int main()
     /* read messages from client and do something with it  */
     while (1) {
       socket_read(buffer);
+      printf("%s\n",buffer);
       if (strncmp(buffer, PROTO_QUIT,3) == 0) {
+        server_quit();
         break;
       }
       else if (strncmp(buffer, PROTO_ADD,3)==0){
-        server_add(list);
+        server_add(&list);
       }
       else if (strncmp(buffer, PROTO_DELETE,3)==0){
-        server_delete();
+        server_delete(&list);
       }
       else if (strncmp(buffer, PROTO_VIEW,3)==0){
-        server_view();
+        server_view(&list);
       }
-      else {
-        printf("Received garbage: \"%s\"",buffer);
+      else if (strlen(buffer)>0) {
+        printf("Received garbage: \"%s\"\n",buffer);
       }
     }
     /*  closing this client's connection  */
@@ -97,3 +99,84 @@ void wait_for_connection()
   printf("got one! \n");
 }
 
+void server_add(ListType *l)
+{
+  SongType *s = calloc(1, sizeof(SongType));
+  char buf[MAX_BUFF];
+  char *param;
+  char *params[3]={s->name,s->album,s->artist};
+  unsigned short i;
+
+  for(i=0; i < 3; ++i) {
+    if(!socket_read_param(&param,PROTO_VALID_USER_INPUT_CHARS))
+      return;
+    strcpy(params[i],buf+1);
+  }
+
+  if(!socket_read_param(&param,PROTO_VALID_USER_INPUT_CHARS_FOR_INTEGER))
+    return;
+  s->duration=atoi(buf+1);
+
+  list_enqueue(l,s);
+}
+
+void server_delete(ListType *l)
+{
+  char buf[MAX_BUFF];
+  char *param;
+  NodeType *pivot, *prev=NULL;
+  bool found = false;
+  if(!socket_read_param(&param,PROTO_VALID_USER_INPUT_CHARS))
+    return;
+
+  pivot = l->head;
+  if(pivot == NULL){
+    printf("Empty list, nothing to delete.\n");
+    socket_send(PROTO_ERROR);
+    return;
+  }
+
+  do {
+    if(strcasecmp(pivot->data->name,buf)==0){
+      found = true;
+      break;
+    }
+    prev=pivot;
+  } while(list_walk(&pivot));
+  
+  if(!found){
+    printf("Song name \"%s\" not found.\n",buf);
+  }
+
+  list_delete(l,prev,pivot);
+}
+
+void server_view(ListType *l)
+{
+  char *view, *tok, *saveptr;
+  NodeType *pivot = l->head;
+
+  socket_send(PROTO_REPLY);
+  if(pivot == NULL){
+    socket_send_raw_param("No songs on the server");
+    socket_send_raw_param(PROTO_END_PARAMETERS);
+    return;
+  }
+
+  view = list_view(l);
+  printf(">>>START\n%sEND<<<\n",view);
+  tok = strtok_r(view,"\n",&saveptr);
+  for(;;){ 
+    if(tok == NULL){
+      break;
+    }
+    socket_send_raw_param(tok);
+    tok=strtok_r(NULL,"\n",&saveptr);
+  }
+  socket_send_raw_param(PROTO_END_PARAMETERS);
+
+  free(view); // free from calloc in list_view
+}
+
+void server_quit()
+{}

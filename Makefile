@@ -1,5 +1,5 @@
 cc := gcc
-CFLAGS := -D_POSIX_C_SOURCE=199309L -Wall -Wextra -Wmissing-prototypes -std=c99 -g -ggdb -g3
+CFLAGS := -D_GNU_SOURCE -D_POSIX_C_SOURCE=199309L -Wall -Wextra -Wmissing-prototypes -std=c11 -g -ggdb -g3
 
 SERVER_SRC := server.c list.c protocol.c
 SERVER_OBJ := $(SERVER_SRC:.c=.o)

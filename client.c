@@ -61,20 +61,32 @@ void client_add(void)
   socket_send_param("Enter artist:\t",PROTO_VALID_USER_INPUT_CHARS);
   socket_send_param("Enter album:\t",PROTO_VALID_USER_INPUT_CHARS);
   socket_send_param("Enter duration:\t",PROTO_VALID_USER_INPUT_CHARS_FOR_INTEGER);
-  socket_send(PROTO_END_PARAMETERS);
+  /* socket_send(PROTO_END_PARAMETERS); */
 }
 
 void client_delete(void)
 {
   socket_send(PROTO_DELETE);
   socket_send_param("Enter song name to delete:\t",PROTO_VALID_USER_INPUT_CHARS);
-  socket_send(PROTO_END_PARAMETERS);
 }
 
 void client_view(void)
 {
+  char buf[MAX_BUFF];
+  char *param;
   socket_send(PROTO_VIEW);
-  
+
+  socket_read(buf);
+  if(strncmp(buf,PROTO_ERROR,3)==0){
+    printf("Server error\n");
+  }
+  else if(strncmp(buf,PROTO_REPLY,3)==0){
+    for(;;){
+      if(!socket_read_param(&param,PROTO_VALID_REPLY_CHARS)){
+        break;
+      }
+    }
+  }
 }
 
 void client_quit(void)

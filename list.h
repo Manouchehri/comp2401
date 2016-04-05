@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <strings.h>
+#include <string.h>
 #include <stdbool.h>
 #include <assert.h>
 #include "defs.h"
@@ -28,5 +29,6 @@ typedef struct List {
 /* list.c */
 void list_init(ListType *l);
 int list_enqueue(ListType *l, SongType *s);
-int list_remove(ListType *l, char *song_name);
-int list_print(ListType *l);
+char *list_view(ListType *l);
+_Bool list_walk(NodeType **pivot);
+_Bool list_delete(ListType *l, NodeType *prev, NodeType *target);
