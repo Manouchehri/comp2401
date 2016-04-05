@@ -1,3 +1,5 @@
+#include "protocol.h"
+
 void socket_send_param(const char *prompt, const char *accept)
 {
   int a,b;
@@ -42,7 +44,7 @@ void socket_read(char *text)
 
   buff[0] = '\0';
 
-  bytesRcv = recv(clientSocket, buff, sizeof (buff), 0);
+  bytesRcv = recv(global_socket, buff, sizeof (buff), 0);
   buff[bytesRcv] = '\0';
   strcpy(text, buff);
 }

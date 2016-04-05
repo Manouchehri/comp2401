@@ -14,6 +14,8 @@
 #include "protocol.h"
 #include "ainsi.h"
 
+extern int global_listen_socket, global_socket;
+
 /* server.c */
-void initServerSocket(void);
-void waitForConnection(void);
+void init_server_socket(void);
+void wait_for_connection(void);

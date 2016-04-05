@@ -1,46 +1,59 @@
 #include  "server.h"
 
-int myListenSocket, clientSocket;
+int global_listen_socket, global_socket;
 
 int main()
 {
   char buffer[MAX_BUFF];
+  ListType list;
+  list_init(&list);
 
-  initServerSocket();
+  init_server_socket();
 
   while (1) {
     /*  waiting for next client to connect  */
-    waitForConnection();
+    wait_for_connection();
     /*  a client has connected  */
 
     /* read messages from client and do something with it  */
     while (1) {
       socket_read(buffer);
-      printf("the client sent:  %s\n", buffer);
-      if (strcmp(buffer, "quit") == 0) {
+      if (strncmp(buffer, PROTO_QUIT,3) == 0) {
         break;
+      }
+      else if (strncmp(buffer, PROTO_ADD,3)==0){
+        server_add(list);
+      }
+      else if (strncmp(buffer, PROTO_DELETE,3)==0){
+        server_delete();
+      }
+      else if (strncmp(buffer, PROTO_VIEW,3)==0){
+        server_view();
+      }
+      else {
+        printf("Received garbage: \"%s\"",buffer);
       }
     }
     /*  closing this client's connection  */
-    close(clientSocket);
+    close(global_socket);
   }
 
   /*  all done, no more clients will be connecting  */
-  close(myListenSocket);
+  close(global_listen_socket);
 
-  return 0;
+  return EXIT_SUCCESS;
 }
 
-void initServerSocket()
+void init_server_socket()
 {
   struct sockaddr_in myAddr;
   int i;
 
   /* create socket */
-  myListenSocket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
-  if (myListenSocket < 0) {
-    printf("couldn't open socket\n");
-    exit(-1);
+  global_listen_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+  if (global_listen_socket < 0) {
+    perror("couldn't open socket");
+    exit(EXIT_FAILURE);
   }
 
   /* setup my server address */
@@ -50,23 +63,23 @@ void initServerSocket()
   myAddr.sin_port = htons( (unsigned short) MY_PORT);
 
   /* bind my listen socket */
-  i = bind(myListenSocket,
+  i = bind(global_listen_socket,
            (struct sockaddr *) &myAddr,
            sizeof (myAddr) );
   if (i < 0) {
-    printf("couldn't bind socket\n");
-    exit(-1);
+    perror("couldn't bind socket");
+    exit(EXIT_FAILURE);
   }
 
   /* listen */
-  i = listen(myListenSocket, 5);
+  i = listen(global_listen_socket, 5);
   if (i < 0) {
-    printf("couldn't listen\n");
-    exit(-1);
+    perror("couldn't listen");
+    exit(EXIT_FAILURE);
   }
 }
 
-void waitForConnection()
+void wait_for_connection()
 {
   struct sockaddr_in clientAddr;
   socklen_t addrSize;
@@ -74,12 +87,12 @@ void waitForConnection()
   printf("waiting for connection... \n");
 
   /* wait for connection request */
-  clientSocket = accept(myListenSocket,
+  global_socket = accept(global_listen_socket,
                         (struct sockaddr *) &clientAddr,
                         &addrSize);
-  if (clientSocket < 0) {
-    printf("couldn't accept the connection\n");
-    exit(-1);
+  if (global_socket < 0) {
+    perror("couldn't accept the connection\n");
+    exit(EXIT_FAILURE);
   }
   printf("got one! \n");
 }

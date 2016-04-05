@@ -25,7 +25,8 @@ typedef struct List {
   NodeType *tail;
 } ListType;
 
-/* ./list.c */
+/* list.c */
+void list_init(ListType *l);
 int list_enqueue(ListType *l, SongType *s);
 int list_remove(ListType *l, char *song_name);
 int list_print(ListType *l);

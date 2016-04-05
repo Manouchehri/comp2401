@@ -1,5 +1,10 @@
 #include "list.h"
 
+void list_init(ListType *l)
+{
+  memset(*l,0,sizeof(ListType));
+}
+
 int list_enqueue(ListType *l, SongType *s)
 {
   NodeType *n = calloc(1, sizeof(NodeType));

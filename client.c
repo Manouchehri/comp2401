@@ -1,18 +1,13 @@
 #include "client.h"
-
+int global_socket;
 int main()
 {
   char str[MAX_STR];
-  struct sigaction sigact;
-
-
   global_socket = -1;
+
   init_client_socket();
 
-  memset(&sigact, 0, sizeof(sigact));
-  sigact.sa_sigaction = sig_handler;
-  sigact.sa_flags = SA_SIGINFO;
-  sigaction(SIGTERM, &sigact, NULL);
+  init_sighandler();
   
   /* get input from user and send to server */
   for (;; ) {
@@ -22,32 +17,44 @@ int main()
     fgets(str, MAX_STR-1, stdin);
 
     if (strncasecmp(str, "a", 1) == 0) {
-      controller_add();
+      client_add();
       continue;
     }
     if (strncasecmp(str, "d", 1) == 0) {
-      controller_delete();
+      client_delete();
       continue;
     }
     if (strncasecmp(str, "v", 1) == 0) {
-      controller_view();
+      client_view();
       continue;
     }
     if (strncasecmp(str, "q", 1) == 0) {
-      controller_quit();
+      client_quit();
       break;
     }
   }
-  raise(SIGTERM);
   return EXIT_SUCCESS;
 }
 
-void sig_handler(int signum, siginfo_t *info, void *ptr)
+void init_sighandler()
 {
-  close(global_socket);
+  struct sigaction sigact;
+  memset(&sigact, 0, sizeof(sigact));
+  sigact.sa_sigaction = sighandler;
+  sigact.sa_flags = SA_SIGINFO;
+  sigaction(SIGINT, &sigact, NULL);
+  sigaction(SIGTERM, &sigact, NULL);
+}
+void sighandler(int signum, siginfo_t *info, void *ptr)
+{
+  if(global_socket != -1){
+    socket_send(PROTO_QUIT);
+    close(global_socket);
+  }
+  exit(EXIT_SUCCESS);
 }
 
-void controller_add(void)
+void client_add(void)
 {
   socket_send(PROTO_ADD);
   socket_send_param("Enter song:\t",PROTO_VALID_USER_INPUT_CHARS);
@@ -57,22 +64,22 @@ void controller_add(void)
   socket_send(PROTO_END_PARAMETERS);
 }
 
-void controller_delete(void)
+void client_delete(void)
 {
   socket_send(PROTO_DELETE);
-  socket_send_param("Enter song name to delete:\t");
+  socket_send_param("Enter song name to delete:\t",PROTO_VALID_USER_INPUT_CHARS);
   socket_send(PROTO_END_PARAMETERS);
 }
 
-void controller_view(void)
+void client_view(void)
 {
   socket_send(PROTO_VIEW);
   
 }
 
-void controller_quit(void)
+void client_quit(void)
 {
-  socket_send(PROTO_QUIT);
+  raise(SIGTERM);
 }
 
 void view_menu(void)

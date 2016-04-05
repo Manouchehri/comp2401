@@ -21,13 +21,15 @@
 #include "defs.h"
 #include "protocol.h"
 
-int  global_socket;
+extern int  global_socket;
 
 /* client.c */
-void sig_handler(int signum, siginfo_t *info, void *ptr);
-void controller_add(void);
-void controller_delete(void);
-void controller_view(void);
-void controller_quit(void);
+int main(void);
+void init_sighandler(void);
+void sighandler(int signum, siginfo_t *info, void *ptr);
+void client_add(void);
+void client_delete(void);
+void client_view(void);
+void client_quit(void);
 void view_menu(void);
 void init_client_socket(void);
