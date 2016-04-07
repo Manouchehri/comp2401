@@ -213,17 +213,15 @@ void server_view(ListType *l)
 
   view = list_view(l);
 
-  socket_send_raw_param(view);
-
-  /* tok = strtok_r(view,"\n",&saveptr); */
-  /* for(;;){  */
-    /* if(tok == NULL){ */
-      /* break; */
-    /* } */
-    /* socket_send_raw_param(tok); */
-    /* tok=strtok_r(NULL,"\n",&saveptr); */
-  /* } */
-  /* socket_send_raw_param(PROTO_END_PARAMETERS); */
+  tok = strtok_r(view,"\n",&saveptr);
+  for(;;){ 
+    if(tok == NULL){
+      break;
+    }
+    socket_send_raw_param(tok);
+    tok=strtok_r(NULL,"\n",&saveptr);
+  }
+  socket_send_raw_param(PROTO_END_PARAMETERS);
 
   free(view); // free from calloc in list_view
 }

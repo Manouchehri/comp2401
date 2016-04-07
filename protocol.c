@@ -106,7 +106,7 @@ char *socket_read_raw_token()
         break;
     }
     pos=buf;
-    endpos=buf+(strlen(buf+1));
+    endpos=buf+strlen(buf);
 
     /* replace newlines with the null char */
     while(*(replace = strchrnul(pos,'\n')) != '\0'){
