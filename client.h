@@ -24,7 +24,6 @@
 extern int  global_socket;
 
 /* client.c */
-int main(void);
 void init_sighandler(void);
 void sighandler(int signum, siginfo_t *info, void *ptr);
 void client_add(void);

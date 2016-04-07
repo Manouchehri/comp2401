@@ -1,0 +1,55 @@
+PREAMBLE
+==============================================================================
+
+Authors
+--------------------
+Yifan He, 100948772
+Guy Hughes, 100731919
+
+
+Purpose
+--------------------
+The purpose of this program is to fulfill the requirements of Assignment 4 for
+COMP 2401 B in Winter 2016 at Carleton University given by Dr. Christine
+Laurendeau.
+
+
+Files
+--------------------
+Makefile
+README
+ainsi.h
+client.c
+client.h
+defs.h
+list.c
+list.h
+protocol.c
+protocol.h
+server.c
+server.h
+
+COMPILATION
+==============================================================================
+
+ - Use the provided Makefile with the production target:
+   `make all`
+
+
+OPERATION
+==============================================================================
+
+1. Compile as directed above.
+
+2. `./server` to execute the server binary; terminate by sending it SIGUSR1.
+
+3. `./client` to execute the client binary.
+
+
+DEBUGGING 
+==============================================================================
+
+ - Use the provided Makefile with the dev target:
+   `make dev`
+
+<!-- vim: set ft=markdown tw=78 ts=3 sw=3 sts=3 fdm=expr et: -->

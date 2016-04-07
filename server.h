@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <signal.h>
 
 #define MY_PORT 60003
 
@@ -17,6 +18,9 @@
 extern int global_listen_socket, global_socket;
 
 /* server.c */
+void init_sighandler(void);
+void sighandlerint(int signum, siginfo_t *info, void *ptr);
+void sighandlerusr1(int signum, siginfo_t *info, void *ptr);
 void init_server_socket(void);
 void wait_for_connection(void);
 void server_add(ListType *l);

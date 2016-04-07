@@ -9,7 +9,7 @@ CLIENT_SRC := client.c protocol.c
 CLIENT_OBJ := $(CLIENT_SRC:.c=.o)
 CLIENT_BIN := client
 
-.PHONY: all dev
+.PHONY: all dev clean
 
 dev: clean all
 	ctags -f .tags -R .

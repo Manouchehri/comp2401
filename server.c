@@ -8,6 +8,8 @@ int main()
   ListType list;
   list_init(&list);
 
+  init_sighandler();
+
   init_server_socket();
 
   while (1) {
@@ -44,6 +46,47 @@ int main()
   close(global_listen_socket);
 
   return EXIT_SUCCESS;
+}
+
+void init_sighandler()
+{
+  struct sigaction sigactint, sigactusr1;
+  memset(&sigactint, 0, sizeof(struct sigaction));
+  memset(&sigactusr1, 0, sizeof(struct sigaction));
+
+  sigactusr1.sa_flags = sigactint.sa_flags = SA_SIGINFO | SA_NODEFER;
+
+  sigactint.sa_sigaction = sighandlerint;
+  sigemptyset(&sigactint.sa_mask);
+
+  sigactusr1.sa_sigaction = sighandlerint;
+  sigemptyset(&sigactusr1.sa_mask);
+  sigaddset(&sigactusr1.sa_mask,SIGINT);
+  sigaddset(&sigactusr1.sa_mask,SIGTERM);
+
+  sigaction(SIGUSR1, &sigactusr1, NULL);
+  sigaction(SIGINT, &sigactint, NULL);
+  //TODO: why can i cant sigint
+}
+/**
+ * Handler for SIGINT.
+ */
+void sighandlerint(int signum, siginfo_t *info, void *ptr)
+{
+  printf("Send SIGUSR1 to terminate me, master.\n");
+}
+/**
+ * Handler for SIGUSR1.
+ * Closes the socket and exits.
+ */
+void sighandlerusr1(int signum, siginfo_t *info, void *ptr)
+{
+  printf("SIGUSR1 received. Terminating.\n");
+  if(global_socket != -1){
+    socket_send(PROTO_QUIT);
+    close(global_socket);
+  }
+  exit(EXIT_SUCCESS);
 }
 
 void init_server_socket()
@@ -103,18 +146,24 @@ void server_add(ListType *l)
 {
   SongType *s = calloc(1, sizeof(SongType));
   char *param;
-  char *params[3]={s->name,s->album,s->artist};
+  char *params[3]={s->name,s->artist,s->album};
   unsigned short i;
 
   for(i=0; i < 3; ++i) {
-    if(!socket_read_param(&param,PROTO_VALID_USER_INPUT_CHARS))
+    if(!socket_read_param(&param,PROTO_VALID_USER_INPUT_CHARS)){
+      printf("invalid param from client");
+      socket_send(PROTO_ERROR);
       return;
-    strcpy(params[i],param+1);
+    }
+    strcpy(params[i],param);
   }
 
-  if(!socket_read_param(&param,PROTO_VALID_USER_INPUT_CHARS_FOR_INTEGER))
+  if(!socket_read_param(&param,PROTO_VALID_USER_INPUT_CHARS_FOR_INTEGER)){
+    printf("invalid param from client");
+    socket_send(PROTO_ERROR);
     return;
-  s->duration=atoi(param+1);
+  }
+  s->duration=atoi(param);
 
   list_enqueue(l,s);
 }
@@ -136,7 +185,7 @@ void server_delete(ListType *l)
   }
 
   do {
-    if(strcasecmp(pivot->data->name,buf)==0){
+    if(strcasecmp(pivot->data->name,param)==0){
       found = true;
       break;
     }

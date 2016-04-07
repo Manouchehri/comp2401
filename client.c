@@ -47,6 +47,7 @@ void init_sighandler()
 }
 void sighandler(int signum, siginfo_t *info, void *ptr)
 {
+  printf("Goodbye master\n");
   if(global_socket != -1){
     socket_send(PROTO_QUIT);
     close(global_socket);
@@ -61,7 +62,6 @@ void client_add(void)
   socket_send_param("Enter artist:\t",PROTO_VALID_USER_INPUT_CHARS);
   socket_send_param("Enter album:\t",PROTO_VALID_USER_INPUT_CHARS);
   socket_send_param("Enter duration:\t",PROTO_VALID_USER_INPUT_CHARS_FOR_INTEGER);
-  /* socket_send(PROTO_END_PARAMETERS); */
 }
 
 void client_delete(void)
@@ -72,28 +72,13 @@ void client_delete(void)
 
 void client_view(void)
 {
-  char buf[MAX_BUFF];
-  char *param;
   socket_send(PROTO_VIEW);
-  socket_shutdown();
-
-  socket_read(buf);
-  if(strncmp(buf,PROTO_ERROR,3)==0){
-    printf("Server error\n");
-    return;
-  }
-  if(strncmp(buf,PROTO_REPLY,3)==0){
-    for(;;){
-      if(!socket_read_param(&param,PROTO_VALID_REPLY_CHARS)){
-        return;
-      }
-    }
-  }
+  socket_read_reply();
 }
 
 void client_quit(void)
 {
-  raise(SIGTERM);
+  raise(SIGINT);
 }
 
 void view_menu(void)

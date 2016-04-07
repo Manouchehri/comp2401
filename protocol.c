@@ -1,29 +1,32 @@
 #include "protocol.h"
+void socket_read_reply(){
+  char *pos;
 
-void socket_shutdown()
-{
-  shutdown(global_socket, SHUT_WR);
+  pos=socket_read_raw_token();
+
+  if(!strncmp(pos,PROTO_REPLY,3)==0){
+    printf("Server error\n");
+    return;
+  }
+  while(socket_read_param(&pos,PROTO_VALID_REPLY_CHARS)){
+    printf("%s\n",pos);
+  }
 }
 
 void socket_send_raw_param(const char *str)
 {
   char buf[MAX_BUFF];
-  size_t len;
   memset(buf,0,MAX_BUFF);
-  len = strlen(str);
+
   strcpy(buf,PROTO_PARAMETER);
   strncat(buf,str,MAX_BUFF);
 
-  if(str[len-1]!='\n'){
-    if(len > MAX_BUFF-2){
-      printf("socket_send_raw_param: buffer overflow prevented");
-      return;
-    }
-    strcat(buf,"\n");
-  }
   socket_send(buf);
 }
 
+/**
+ * Send a parameter to the socket.
+ */
 void socket_send_param(const char *prompt, const char *accept)
 {
   int a,b;
@@ -57,15 +60,48 @@ void socket_send_param(const char *prompt, const char *accept)
  */
 bool socket_read_param(char **param, const char *accept)
 {
+  char   *pos=NULL;
+
+  pos=socket_read_raw_token();
+  
+  if(*pos == '\0' || strncmp(pos+1,PROTO_PARAMETER PROTO_END_PARAMETERS,2)==0){
+    return false;
+  }
+  
+  if(
+      strncmp(pos,PROTO_PARAMETER,1)!=0  /* first char must be protocol parameter marker */
+      ||
+      strspn(pos+1, accept) != strlen(pos+1) /* rest must be chars ∈ accept */ 
+    ){
+    printf("Received invalid parameter: \"%s\"\n",pos);
+    return false;
+  }
+  else {
+    pos += 1;
+  }
+  
+  if (param != NULL){
+    *param = pos;
+  }
+  return true;
+}
+
+/**
+ * @return A char* indicating the start of the next line read from the socket, terminated by \0.
+ * Never returns a null pointer or a pointer to null character.
+ */
+char *socket_read_raw_token()
+{
+
   static char   bufarr[MAX_BUFF], *buf=bufarr;
   static char   *pos=NULL, *endpos=NULL;
-
   char *replace;
 
-  if ( &pos >= &endpos ){
+  if ( &pos >= &endpos || *pos == 0 ){
     // read from the socket
     for(;;){
       socket_read(buf); 
+      printf(">>>START\n%s<<<END\n",buf);
       if(strlen(buf)>0)
         break;
     }
@@ -85,46 +121,41 @@ bool socket_read_param(char **param, const char *accept)
     // move pos forward in buf
     pos = strchr(pos,'\0');
   }
-
-  printf(">>>START\n%s\n<<<END\n",buf);
-  if(strncmp(buf+1,PROTO_PARAMETER PROTO_END_PARAMETERS,2)==0){
-    return false;
-  }
-  if(
-      strncmp(pos,PROTO_PARAMETER,1)!=0  /* first char must be protocol parameter marker */
-      ||
-      strspn(pos+1, accept) != strlen(pos+1) /* rest must be chars ∈ accept */ 
-    ){
-    printf("Received invalid parameter: \"%s\"\n",buf);
-    return false;
-  }
-  printf("%s\n",buf+1);
-  
-  if (param != NULL){
-    *param = pos;
-  }
-  return true;
+  return pos;
 }
 
 void socket_send(const char *str)
 {
+  size_t len = strlen(str);
+  char *buf;
+
   assert(global_socket != -1); // the socket must be initialized
 
-  if (strlen(str) > MAX_BUFF-1){ // -1 for \0
+  if (len > MAX_BUFF-1){ // -1 for \0
     perror("socket_send: buffer overflow prevented");
-    exit(EXIT_FAILURE);
+    return;
   }
-  send(global_socket, str, strlen(str), 0);
+  printf(str);
+
+  if (str[len-1] != '\n'){ // always send \n
+    buf = calloc(2,len);
+    strcpy(buf,str);
+    strcat(buf,"\n\0");
+    send(global_socket, buf, strlen(buf), 0);
+    free(buf);
+    return;
+  }
+  send(global_socket, str, len, 0);
 }
 
 void socket_read(char *text)
 {
-  char buff[MAX_BUFF];
+  char buf[MAX_BUFF];
   int bytesRcv;
 
-  buff[0] = '\0';
+  buf[0] = '\0';
 
-  bytesRcv = recv(global_socket, buff, sizeof (buff), 0);
-  buff[bytesRcv] = '\0';
-  strcpy(text, buff);
+  bytesRcv = recv(global_socket, buf, sizeof (buf), 0);
+  buf[bytesRcv] = '\0';
+  strcpy(text, buf);
 }
