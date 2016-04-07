@@ -29,6 +29,7 @@ extern int global_socket;
 
 
 /* protocol.c */
+void socket_shutdown(void);
 void socket_send_raw_param(const char *str);
 void socket_send_param(const char *prompt, const char *accept);
 _Bool socket_read_param(char **param, const char *accept);

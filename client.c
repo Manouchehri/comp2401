@@ -75,15 +75,17 @@ void client_view(void)
   char buf[MAX_BUFF];
   char *param;
   socket_send(PROTO_VIEW);
+  socket_shutdown();
 
   socket_read(buf);
   if(strncmp(buf,PROTO_ERROR,3)==0){
     printf("Server error\n");
+    return;
   }
-  else if(strncmp(buf,PROTO_REPLY,3)==0){
+  if(strncmp(buf,PROTO_REPLY,3)==0){
     for(;;){
       if(!socket_read_param(&param,PROTO_VALID_REPLY_CHARS)){
-        break;
+        return;
       }
     }
   }

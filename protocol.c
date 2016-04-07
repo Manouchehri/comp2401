@@ -1,5 +1,10 @@
 #include "protocol.h"
 
+void socket_shutdown()
+{
+  shutdown(global_socket, SHUT_WR);
+}
+
 void socket_send_raw_param(const char *str)
 {
   char buf[MAX_BUFF];
@@ -59,7 +64,11 @@ bool socket_read_param(char **param, const char *accept)
 
   if ( &pos >= &endpos ){
     // read from the socket
-    socket_read(buf); 
+    for(;;){
+      socket_read(buf); 
+      if(strlen(buf)>0)
+        break;
+    }
     pos=buf;
     endpos=buf+(strlen(buf+1));
 
@@ -78,15 +87,15 @@ bool socket_read_param(char **param, const char *accept)
   }
 
   printf(">>>START\n%s\n<<<END\n",buf);
+  if(strncmp(buf+1,PROTO_PARAMETER PROTO_END_PARAMETERS,2)==0){
+    return false;
+  }
   if(
       strncmp(pos,PROTO_PARAMETER,1)!=0  /* first char must be protocol parameter marker */
       ||
       strspn(pos+1, accept) != strlen(pos+1) /* rest must be chars ∈ accept */ 
     ){
     printf("Received invalid parameter: \"%s\"\n",buf);
-    return false;
-  }
-  if(strncmp(buf+1,PROTO_END_PARAMETERS,1)==0){
     return false;
   }
   printf("%s\n",buf+1);

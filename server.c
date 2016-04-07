@@ -102,7 +102,6 @@ void wait_for_connection()
 void server_add(ListType *l)
 {
   SongType *s = calloc(1, sizeof(SongType));
-  char buf[MAX_BUFF];
   char *param;
   char *params[3]={s->name,s->album,s->artist};
   unsigned short i;
@@ -110,12 +109,12 @@ void server_add(ListType *l)
   for(i=0; i < 3; ++i) {
     if(!socket_read_param(&param,PROTO_VALID_USER_INPUT_CHARS))
       return;
-    strcpy(params[i],buf+1);
+    strcpy(params[i],param+1);
   }
 
   if(!socket_read_param(&param,PROTO_VALID_USER_INPUT_CHARS_FOR_INTEGER))
     return;
-  s->duration=atoi(buf+1);
+  s->duration=atoi(param+1);
 
   list_enqueue(l,s);
 }
