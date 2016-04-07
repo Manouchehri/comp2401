@@ -59,10 +59,10 @@ void init_sighandler()
   sigactint.sa_sigaction = sighandlerint;
   sigemptyset(&sigactint.sa_mask);
 
-  sigactusr1.sa_sigaction = sighandlerint;
+  sigactusr1.sa_sigaction = sighandlerusr1;
   sigemptyset(&sigactusr1.sa_mask);
-  sigaddset(&sigactusr1.sa_mask,SIGINT);
-  sigaddset(&sigactusr1.sa_mask,SIGTERM);
+  /* sigaddset(&sigactusr1.sa_mask,SIGINT); */
+  /* sigaddset(&sigactusr1.sa_mask,SIGTERM); */
 
   sigaction(SIGUSR1, &sigactusr1, NULL);
   sigaction(SIGINT, &sigactint, NULL);
@@ -212,16 +212,18 @@ void server_view(ListType *l)
   }
 
   view = list_view(l);
-  printf(">>>START\n%sEND<<<\n",view);
-  tok = strtok_r(view,"\n",&saveptr);
-  for(;;){ 
-    if(tok == NULL){
-      break;
-    }
-    socket_send_raw_param(tok);
-    tok=strtok_r(NULL,"\n",&saveptr);
-  }
-  socket_send_raw_param(PROTO_END_PARAMETERS);
+
+  socket_send_raw_param(view);
+
+  /* tok = strtok_r(view,"\n",&saveptr); */
+  /* for(;;){  */
+    /* if(tok == NULL){ */
+      /* break; */
+    /* } */
+    /* socket_send_raw_param(tok); */
+    /* tok=strtok_r(NULL,"\n",&saveptr); */
+  /* } */
+  /* socket_send_raw_param(PROTO_END_PARAMETERS); */
 
   free(view); // free from calloc in list_view
 }

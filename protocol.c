@@ -101,7 +101,7 @@ char *socket_read_raw_token()
     // read from the socket
     for(;;){
       socket_read(buf); 
-      printf(">>>START\n%s<<<END\n",buf);
+      /* printf(">>>START\n%s<<<END\n",buf); */
       if(strlen(buf)>0)
         break;
     }
@@ -135,7 +135,7 @@ void socket_send(const char *str)
     perror("socket_send: buffer overflow prevented");
     return;
   }
-  printf(str);
+  /* printf(str); */
 
   if (str[len-1] != '\n'){ // always send \n
     buf = calloc(2,len);
